@@ -93,41 +93,6 @@
         .add-team {
             background-color: #2ecc71;
         }
-        .decision-dialog {
-            background-color: #fdecea;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-            border-left: 4px solid #d32f2f;
-        }
-        .decision-option {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #e7f5ff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .decision-option:hover {
-            background-color: #d0ebff;
-        }
-        .decision-result {
-            font-weight: bold;
-            margin-top: 10px;
-            padding: 8px;
-            border-radius: 4px;
-        }
-        .negative-decision {
-            background-color: #fdecea;
-            color: #d32f2f;
-        }
-        .positive-decision {
-            background-color: #e8f5e9;
-            color: #388e3c;
-        }
-        .selected {
-            background-color: #bbdefb;
-            border: 2px solid #2196f3;
-        }
     </style>
 </head>
 <body>
@@ -147,7 +112,6 @@
         <div id="result-section" class="result-section hidden">
             <h2>Результаты распределения прибыли</h2>
             <div id="corporate-info"></div>
-            <div id="eco-decisions"></div>
             <div id="team-results"></div>
         </div>
     </div>
@@ -158,7 +122,6 @@
         let currentAverageEco = 0;
         let currentBasePetrolPrice = 0;
         let currentBaseDieselPrice = 0;
-        let currentEcoDecision = null;
 
         // Данные о месторождениях
         const locations = [
@@ -270,8 +233,7 @@
                     oilVolume: parseFloat(document.getElementById(`team-${teamId}-oil`).value) * 1000000,
                     petrolPercent: parseFloat(document.getElementById(`team-${teamId}-petrol`).value),
                     dieselPercent: parseFloat(document.getElementById(`team-${teamId}-diesel`).value),
-                    priceMod: parseFloat(document.getElementById(`team-${teamId}-price-mod`).value) || 0,
-                    decisions: {}
+                    priceMod: parseFloat(document.getElementById(`team-${teamId}-price-mod`).value) || 0
                 };
                 
                 team.petrolVolume = team.oilVolume * team.petrolPercent / 100;
@@ -294,163 +256,15 @@
             currentBasePetrolPrice = BASE_PETROL_PRICE + currentAverageEco;
             currentBaseDieselPrice = BASE_DIESEL_PRICE + currentAverageEco;
             
-            // Сбрасываем предыдущее решение
-            currentEcoDecision = null;
-            
-            // Применяем экологические решения
-            let ecoDecisionsHTML = '';
-            
-            if (currentAverageEco < 0) {
-                // Вариант А: отрицательные эко-баллы
-                ecoDecisionsHTML = `
-                    <div class="decision-dialog">
-                        <h3>Экологи бьют тревогу! Вашу нефть называют 'грязной'.</h3>
-                        <p>Средний эко-рейтинг: ${currentAverageEco.toFixed(2)}</p>
-                        <div class="decision-option" onclick="applyEcoDecision('price-cut')">
-                            1) Снизить цену на 20% – быстрая продажа, но с убытком
-                        </div>
-                        <div class="decision-option" onclick="applyEcoDecision('compensate')">
-                            2) Инвестировать в экокомпенсацию (500 тыс мгр)
-                        </div>
-                        <div id="eco-decision-result" class="decision-result hidden"></div>
-                    </div>
-                `;
-                
-                // Выбираем первый вариант по умолчанию
-                setTimeout(() => {
-                    document.querySelector('.decision-option')?.click();
-                }, 0);
-            } 
-            else if (currentAverageEco >= 5) {
-                // Вариант Б: высокие эко-баллы
-                ecoDecisionsHTML = `
-                    <div class="decision-dialog">
-                        <h3>Ваша нефть востребована! Как увеличить прибыль?</h3>
-                        <p>Средний эко-рейтинг: ${currentAverageEco.toFixed(2)}</p>
-                        <div class="decision-option" onclick="applyEcoDecision('premium-sale')">
-                            1) Продать 20% объёма по двойной цене
-                        </div>
-                        <div class="decision-option" onclick="applyEcoDecision('government-support')">
-                            2) Получить господдержку (700 тыс мгр)
-                        </div>
-                        <div id="eco-decision-result" class="decision-result hidden"></div>
-                    </div>
-                `;
-                
-                // Выбираем первый вариант по умолчанию
-                setTimeout(() => {
-                    document.querySelector('.decision-option')?.click();
-                }, 0);
-            }
-            else {
-                // Нейтральный случай - просто пересчитываем прибыль
-                recalculateProfit();
-            }
-            
-            document.getElementById('eco-decisions').innerHTML = ecoDecisionsHTML;
-            updateResults();
-        }
-        
-        // Функция для применения экологических решений
-        function applyEcoDecision(decisionType) {
-            currentEcoDecision = decisionType;
-            
-            // Снимаем выделение со всех вариантов
-            document.querySelectorAll('.decision-option').forEach(option => {
-                option.classList.remove('selected');
+            // Рассчитываем прибыль для каждой команды
+            currentTeams.forEach(team => {
+                team.petrolPrice = currentBasePetrolPrice * (1 + team.priceMod / 100);
+                team.dieselPrice = currentBaseDieselPrice * (1 + team.priceMod / 100);
+                team.profit = team.petrolVolume * team.petrolPrice + team.dieselVolume * team.dieselPrice;
             });
-            
-            // Выделяем выбранный вариант
-            if (event && event.target) {
-                event.target.classList.add('selected');
-            }
-            
-            // Показываем результат выбора
-            const resultDiv = document.getElementById('eco-decision-result');
-            if (resultDiv) {
-                resultDiv.classList.remove('hidden');
-                
-                switch(decisionType) {
-                    case 'price-cut':
-                        resultDiv.className = 'decision-result negative-decision';
-                        resultDiv.innerHTML = 'Применено: Снижение цен на 20%';
-                        break;
-                    case 'compensate':
-                        resultDiv.className = 'decision-result negative-decision';
-                        resultDiv.innerHTML = 'Применено: Инвестиции в экокомпенсацию (500 тыс мгр)';
-                        break;
-                    case 'premium-sale':
-                        resultDiv.className = 'decision-result positive-decision';
-                        resultDiv.innerHTML = 'Применено: Премиальная продажа 20% объема';
-                        break;
-                    case 'government-support':
-                        resultDiv.className = 'decision-result positive-decision';
-                        resultDiv.innerHTML = 'Применено: Получение господдержки (700 тыс мгр)';
-                        break;
-                }
-            }
-            
-            // Пересчитываем прибыль с учетом выбранного решения
-            recalculateProfit();
-        }
-        
-        // Пересчет прибыли с учетом выбранного решения
-        function recalculateProfit() {
-            let basePetrolPrice = currentBasePetrolPrice;
-            let baseDieselPrice = currentBaseDieselPrice;
-            let ecoBonus = 0;
-            let ecoPenalty = 0;
-            
-            // Применяем выбранное решение
-            if (currentEcoDecision === 'price-cut') {
-                basePetrolPrice *= 0.8;
-                baseDieselPrice *= 0.8;
-            } 
-            else if (currentEcoDecision === 'compensate') {
-                ecoPenalty = 500000;
-            } 
-            else if (currentEcoDecision === 'premium-sale') {
-                // Для премиальной продажи увеличиваем цену для 20% объема
-                currentTeams.forEach(team => {
-                    const premiumVolumePetrol = team.petrolVolume * 0.2;
-                    const premiumVolumeDiesel = team.dieselVolume * 0.2;
-                    
-                    team.petrolVolume -= premiumVolumePetrol;
-                    team.dieselVolume -= premiumVolumeDiesel;
-                    
-                    // Инициализация цен для команды
-                    team.petrolPrice = basePetrolPrice * (1 + team.priceMod / 100);
-                    team.dieselPrice = baseDieselPrice * (1 + team.priceMod / 100);
-                    
-                    team.profit = (team.petrolVolume * team.petrolPrice) +
-                                 (team.dieselVolume * team.dieselPrice) +
-                                 (premiumVolumePetrol * team.petrolPrice * 2) +
-                                 (premiumVolumeDiesel * team.dieselPrice * 2);
-                    
-                    // Возвращаем объемы на место для возможного пересчета
-                    team.petrolVolume += premiumVolumePetrol;
-                    team.dieselVolume += premiumVolumeDiesel;
-                });
-            } 
-            else if (currentEcoDecision === 'government-support') {
-                ecoBonus = 700000;
-            }
-            
-            // Рассчитываем прибыль для каждой команды (если не премиальная продажа)
-            if (currentEcoDecision !== 'premium-sale') {
-                currentTeams.forEach(team => {
-                    team.petrolPrice = basePetrolPrice * (1 + team.priceMod / 100);
-                    team.dieselPrice = baseDieselPrice * (1 + team.priceMod / 100);
-                    team.profit = team.petrolVolume * team.petrolPrice + team.dieselVolume * team.dieselPrice;
-                });
-            }
             
             // Общая прибыль корпорации
             let totalProfit = currentTeams.reduce((sum, team) => sum + team.profit, 0);
-            
-            // Применяем экологические штрафы/бонусы
-            totalProfit -= ecoPenalty;
-            totalProfit += ecoBonus;
             
             // Бонус за объединение (+10%)
             const bonusProfit = totalProfit * 0.1;
@@ -482,8 +296,8 @@
                         <h3>${team.location} (Команда ${team.id})</h3>
                         <p><strong>Добыто нефти:</strong> ${(team.oilVolume / 1000000).toFixed(2)} млн баррелей</p>
                         <p><strong>Эко-баллы:</strong> <span class="${team.ecoPoints > 0 ? 'positive' : team.ecoPoints < 0 ? 'negative' : ''}">${team.ecoPoints}</span></p>
-                        <p><strong>Цена бензина:</strong> ${team.petrolPrice ? team.petrolPrice.toFixed(2) : '0.00'} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
-                        <p><strong>Цена дизеля:</strong> ${team.dieselPrice ? team.dieselPrice.toFixed(2) : '0.00'} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
+                        <p><strong>Цена бензина:</strong> ${team.petrolPrice.toFixed(2)} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
+                        <p><strong>Цена дизеля:</strong> ${team.dieselPrice.toFixed(2)} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
                         <p><strong>Доля в корпорации:</strong> ${(team.share * 100).toFixed(1)}%</p>
                         <p><strong>Итоговая прибыль:</strong> <strong>${Math.round(team.finalProfit).toLocaleString()} мгр</strong></p>
                     </div>
