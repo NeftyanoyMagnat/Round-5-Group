@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Раунд 5: Объединение в корпорации</title>
+    <title>«Нефтяной Магнат: От скважины до рынка» - Раунд 5</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -11,26 +11,44 @@
             padding: 20px;
             color: #333;
             background-image: url('image.png');
-            background-color: #f5f5f5;
+            background-size: cover;
+            background-attachment: fixed;
         }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1, h2, h3 {
+        h1 {
             color: #2c3e50;
             text-align: center;
-        }
-        .team-section {
-            margin-bottom: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
             padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 20px auto;
+            border: 2px solid #2980b9;
+        }
+        .location {
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px auto;
+            max-width: 700px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            border: 2px solid #3498db;
+        }
+        .location:hover {
+            background-color: rgba(255, 255, 255, 0.95);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .screen {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px auto;
+            max-width: 700px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid #2980b9;
         }
         .form-group {
             margin-bottom: 15px;
@@ -40,38 +58,41 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input, select {
+        input[type="number"] {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
         }
-        button {
+        .next-button {
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 12px 25px;
+            border-radius: 8px;
             cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
             font-size: 16px;
-            margin: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
         }
-        button:hover {
+        .next-button:hover {
             background-color: #2980b9;
+            transform: scale(1.05);
         }
-        .result-section {
-            margin-top: 30px;
+        #result-content {
+            background-color: rgba(240, 240, 240, 0.9);
             padding: 20px;
-            background-color: #eaf2f8;
-            border-radius: 5px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
         }
-        .team-result {
-            margin-bottom: 15px;
+        .result-item {
+            margin: 10px 0;
             padding: 10px;
-            background-color: white;
-            border-radius: 4px;
-            border-left: 4px solid #3498db;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
         }
         .positive {
             color: #27ae60;
@@ -79,234 +100,356 @@
         .negative {
             color: #e74c3c;
         }
+        .dice-roll {
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .dice-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .dice {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            position: relative;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 60px;
+            text-align: center;
+            animation: roll 1s ease-out;
+        }
+        @keyframes roll {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        .dice-result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
         .hidden {
             display: none;
-        }
-        .team-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .remove-team {
-            background-color: #e74c3c;
-        }
-        .add-team {
-            background-color: #2ecc71;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Раунд 5: Объединение в корпорации</h1>
-        <h2>Объединение команд (от 2)</h2>
-        
-        <div id="team-container">
-            <!-- Команды будут добавляться здесь -->
+    <div id="main-screen" class="screen">
+        <h1>Раунд 5: Продажа нефтепродуктов</h1>
+        <div id="locations-container"></div>
+    </div>
+
+    <div id="sale-screen" class="screen">
+        <h1 id="location-title"></h1>
+        <div class="form-group">
+            <label for="oil-volume">Общий объём добытой нефти (млн баррелей):</label>
+            <input type="number" id="oil-volume" min="0" step="0.1" value="1.0">
         </div>
-        
-        <div style="text-align: center;">
-            <button id="add-team-btn" class="add-team">+ Добавить команду</button>
-            <button id="calculate-btn">Рассчитать прибыль</button>
+        <div class="form-group">
+            <label for="petrol-percent">Процент переработанный в бензин (базовая цена 70 мгр/баррель):</label>
+            <input type="number" id="petrol-percent" min="0" max="100" step="1" value="50">
         </div>
-        
-        <div id="result-section" class="result-section hidden">
-            <h2>Результаты распределения прибыли</h2>
-            <div id="corporate-info"></div>
-            <div id="team-results"></div>
+        <div class="form-group">
+            <label for="diesel-percent">Процент переработанный в дизель (базовая цена 85 мгр/баррель):</label>
+            <input type="number" id="diesel-percent" min="0" max="100" step="1" value="30">
         </div>
+        <div class="form-group">
+            <label for="price-mod">Поправка к цене нефтепродуктов (%):</label>
+            <input type="number" id="price-mod" min="-100" max="100" step="1" value="0">
+        </div>
+        <div class="form-group">
+            <label for="eco-points">Количество эко-баллов:</label>
+            <input type="number" id="eco-points" min="-100" max="100" step="1" value="0">
+        </div>
+        <button class="next-button" onclick="calculateProfit()">Рассчитать прибыль</button>
+    </div>
+
+    <div id="bad-eco-screen" class="screen">
+        <h1>Экологи бьют тревогу!</h1>
+        <p>Вашу нефть называют 'грязной'. Выберите стратегию продажи:</p>
+        <div class="form-group">
+            <label>
+                <input type="radio" name="bad-eco-option" value="1" checked>
+                Снизить цену на 20% — быстрая продажа, но с убытком
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="radio" name="bad-eco-option" value="2">
+                Инвестировать в экокомпенсацию (500 тыс мгр) — цена не падает, но прибыль уменьшается
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="radio" name="bad-eco-option" value="3">
+                Найти стратегического партнёра (результат определит кубик)
+            </label>
+        </div>
+        <button class="next-button" onclick="applyBadEcoStrategy()">Применить стратегию</button>
+    </div>
+
+    <div id="good-eco-screen" class="screen">
+        <h1>Ваша нефть востребована!</h1>
+        <p>Как увеличить прибыль? Выберите стратегию:</p>
+        <div class="form-group">
+            <label>
+                <input type="radio" name="good-eco-option" value="1" checked>
+                Продать 20% объёма по двойной цене
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="radio" name="good-eco-option" value="2">
+                Получить господдержку (700 тыс мгр за "зелёные" технологии)
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="radio" name="good-eco-option" value="3">
+                Создать альянс (результат определит кубик)
+            </label>
+        </div>
+        <button class="next-button" onclick="applyGoodEcoStrategy()">Применить стратегию</button>
+    </div>
+
+    <div id="dice-screen" class="screen">
+        <h1>Бросок кубика</h1>
+        <div class="dice-container">
+            <div id="dice" class="dice">?</div>
+            <div id="dice-result" class="dice-result"></div>
+        </div>
+        <button id="continue-btn" class="next-button hidden">Продолжить</button>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h1 style="color: #3498db;">Результаты продажи</h1>
+        <div id="result-content"></div>
+        <button class="next-button" onclick="showMainScreen()">Начать заново</button>
     </div>
 
     <script>
-        // Глобальные переменные для хранения данных расчета
-        let currentTeams = [];
-        let currentAverageEco = 0;
-        let currentBasePetrolPrice = 0;
-        let currentBaseDieselPrice = 0;
+        const locations = {
+            prirazlomnoye: { name: "Приразломное месторождение" },
+            vankorskoye: { name: "Ванкорское месторождение" },
+            samotlorskoye: { name: "Самотлорское месторождение" },
+            romashkinskoye: { name: "Ромашкинское месторождение" },
+            shtokmanovskoye: { name: "Штокмановское месторождение" },
+            urengoy: { name: "Уренгойское месторождение" },
+            tuymazinskoye: { name: "Туймазинское месторождение" }
+        };
 
-        // Данные о месторождениях
-        const locations = [
-            "Приразломное месторождение",
-            "Ванкорское месторождение",
-            "Самотлорское месторождение",
-            "Ромашкинское месторождение",
-            "Штокмановское месторождение",
-            "Уренгойское месторождение",
-            "Туймазинское месторождение"
-        ];
+        let currentLocation = null;
+        let profitData = {
+            oilVolume: 0,
+            petrolVolume: 0,
+            petrolPrice: 70,
+            dieselVolume: 0,
+            dieselPrice: 85,
+            priceMod: 0,
+            ecoPoints: 0,
+            baseProfit: 0,
+            finalProfit: 0,
+            diceRoll: 0,
+            currentStrategy: null // 'bad' или 'good'
+        };
 
-        // Базовая цена
-        const BASE_PETROL_PRICE = 70;
-        const BASE_DIESEL_PRICE = 85;
-        
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            // Добавляем начальные 2 команды
-            addTeam(1);
-            addTeam(2);
+        window.onload = function() {
+            showMainScreen();
+            document.getElementById('continue-btn').addEventListener('click', processDiceResult);
+        };
+
+        function showMainScreen() {
+            document.getElementById('main-screen').style.display = 'block';
+            document.getElementById('sale-screen').style.display = 'none';
+            document.getElementById('bad-eco-screen').style.display = 'none';
+            document.getElementById('good-eco-screen').style.display = 'none';
+            document.getElementById('dice-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'none';
+
+            const container = document.getElementById('locations-container');
+            container.innerHTML = '';
+
+            for (const [key, loc] of Object.entries(locations)) {
+                const div = document.createElement('div');
+                div.className = 'location';
+                div.textContent = loc.name;
+                div.onclick = function() { selectLocation(key); };
+                container.appendChild(div);
+            }
+        }
+
+        function selectLocation(locKey) {
+            currentLocation = locations[locKey];
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('sale-screen').style.display = 'block';
+            document.getElementById('location-title').textContent = currentLocation.name;
+        }
+
+        function calculateProfit() {
+            const oilVolumeMln = parseFloat(document.getElementById('oil-volume').value) || 0;
+            profitData.oilVolume = oilVolumeMln * 1000000;
             
-            // Обработчики кнопок
-            document.getElementById('add-team-btn').addEventListener('click', function() {
-                const teamSections = document.querySelectorAll('.team-section');
-                if (teamSections.length < 7) {
-                    addTeam(teamSections.length + 1);
-                    if (teamSections.length + 1 === 7) {
-                        this.disabled = true;
+            const petrolPercent = parseInt(document.getElementById('petrol-percent').value) || 0;
+            const dieselPercent = parseInt(document.getElementById('diesel-percent').value) || 0;
+            profitData.priceMod = parseInt(document.getElementById('price-mod').value) || 0;
+            profitData.ecoPoints = parseInt(document.getElementById('eco-points').value) || 0;
+
+            profitData.petrolVolume = profitData.oilVolume * petrolPercent / 100;
+            profitData.dieselVolume = profitData.oilVolume * dieselPercent / 100;
+
+            const petrolPriceWithEco = profitData.petrolPrice + profitData.ecoPoints;
+            const dieselPriceWithEco = profitData.dieselPrice + profitData.ecoPoints;
+
+            const finalPetrolPrice = petrolPriceWithEco * (1 + profitData.priceMod / 100);
+            const finalDieselPrice = dieselPriceWithEco * (1 + profitData.priceMod / 100);
+
+            profitData.baseProfit = profitData.petrolVolume * finalPetrolPrice + profitData.dieselVolume * finalDieselPrice;
+
+            if (profitData.ecoPoints < 0) {
+                document.getElementById('sale-screen').style.display = 'none';
+                document.getElementById('bad-eco-screen').style.display = 'block';
+            } else if (profitData.ecoPoints >= 5) {
+                document.getElementById('sale-screen').style.display = 'none';
+                document.getElementById('good-eco-screen').style.display = 'block';
+            } else {
+                profitData.finalProfit = profitData.baseProfit;
+                showResult();
+            }
+        }
+
+        function applyBadEcoStrategy() {
+            const selectedOption = document.querySelector('input[name="bad-eco-option"]:checked').value;
+            
+            if (selectedOption === "3") {
+                profitData.currentStrategy = 'bad';
+                rollDice();
+            } else {
+                if (selectedOption === "1") {
+                    profitData.finalProfit = profitData.baseProfit * 0.8;
+                } else if (selectedOption === "2") {
+                    profitData.finalProfit = profitData.baseProfit - 500000;
+                }
+                showResult();
+            }
+        }
+
+        function applyGoodEcoStrategy() {
+            const selectedOption = document.querySelector('input[name="good-eco-option"]:checked').value;
+            
+            if (selectedOption === "3") {
+                profitData.currentStrategy = 'good';
+                rollDice();
+            } else {
+                if (selectedOption === "1") {
+                    const premiumVolume = (profitData.petrolVolume + profitData.dieselVolume) * 0.2;
+                    const regularVolume = (profitData.petrolVolume + profitData.dieselVolume) * 0.8;
+                    const avgPrice = (profitData.petrolPrice + profitData.dieselPrice) / 2;
+                    profitData.finalProfit = regularVolume * avgPrice + premiumVolume * avgPrice * 2;
+                } else if (selectedOption === "2") {
+                    profitData.finalProfit = profitData.baseProfit + 700000;
+                }
+                showResult();
+            }
+        }
+
+        function rollDice() {
+            document.getElementById('bad-eco-screen').style.display = 'none';
+            document.getElementById('good-eco-screen').style.display = 'none';
+            document.getElementById('dice-screen').style.display = 'block';
+            
+            const dice = document.getElementById('dice');
+            dice.textContent = '?';
+            document.getElementById('dice-result').textContent = '';
+            document.getElementById('continue-btn').classList.add('hidden');
+            
+            // Анимация броска кубика
+            let rolls = 0;
+            const maxRolls = 10;
+            const rollInterval = setInterval(() => {
+                profitData.diceRoll = Math.floor(Math.random() * 6) + 1;
+                dice.textContent = profitData.diceRoll;
+                rolls++;
+                
+                if (rolls >= maxRolls) {
+                    clearInterval(rollInterval);
+                    document.getElementById('continue-btn').classList.remove('hidden');
+                    
+                    // Показываем результат броска
+                    if (profitData.currentStrategy === 'bad') {
+                        document.getElementById('dice-result').textContent = 
+                            profitData.diceRoll <= 3 ? 
+                            '1-3: Партнёр требует долю → -30% прибыли' : 
+                            '4-6: Удачное сотрудничество → +200 тыс мгр';
+                    } else {
+                        document.getElementById('dice-result').textContent = 
+                            profitData.diceRoll <= 3 ? 
+                            '1-3: Партнёр забирает 15% прибыли' : 
+                            '4-6: Удачный альянс → +500 тыс мгр';
                     }
                 }
-            });
-            
-            document.getElementById('calculate-btn').addEventListener('click', calculateProfit);
-        });
-        
-        // Добавление новой команды
-        function addTeam(teamId) {
-            const teamHTML = `
-                <div class="team-section" id="team-${teamId}">
-                    <div class="team-header">
-                        <h3>Команда ${teamId}</h3>
-                        ${teamId > 2 ? `<button class="remove-team" onclick="removeTeam(${teamId})">× Удалить</button>` : ''}
-                    </div>
-                    <div class="form-group">
-                        <label for="team-${teamId}-location">Месторождение:</label>
-                        <select id="team-${teamId}-location" required>
-                            ${locations.map(loc => `<option value="${loc}">${loc}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="team-${teamId}-eco">Эко-баллы:</label>
-                        <input type="number" id="team-${teamId}-eco" min="-100" max="100" value="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="team-${teamId}-oil">Добыто нефти (млн баррелей):</label>
-                        <input type="number" id="team-${teamId}-oil" min="0" step="0.1" value="1.0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="team-${teamId}-petrol">Процент бензина:</label>
-                        <input type="number" id="team-${teamId}-petrol" min="0" max="100" value="50" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="team-${teamId}-diesel">Процент дизеля:</label>
-                        <input type="number" id="team-${teamId}-diesel" min="0" max="100" value="30" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="team-${teamId}-price-mod">Поправка к цене нефтепродуктов (%):</label>
-                        <input type="number" id="team-${teamId}-price-mod" min="-100" max="100" value="0">
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('team-container').insertAdjacentHTML('beforeend', teamHTML);
+            }, 150);
         }
-        
-        // Удаление команды
-        function removeTeam(id) {
-            document.getElementById(`team-${id}`).remove();
-            document.getElementById('add-team-btn').disabled = false;
-            
-            // Перенумеровываем оставшиеся команды
-            const teams = document.querySelectorAll('.team-section');
-            teams.forEach((team, index) => {
-                const newId = index + 1;
-                team.id = `team-${newId}`;
-                team.querySelector('h3').textContent = `Команда ${newId}`;
-                
-                // Обновляем ID всех полей ввода
-                const inputs = team.querySelectorAll('input, select');
-                inputs.forEach(input => {
-                    input.id = input.id.replace(/team-\d+/, `team-${newId}`);
-                });
-            });
-        }
-        
-        // Расчет прибыли
-        function calculateProfit() {
-            // Собираем данные всех команд
-            currentTeams = [];
-            const teamSections = document.querySelectorAll('.team-section');
-            
-            teamSections.forEach((section, index) => {
-                const teamId = index + 1;
-                const team = {
-                    id: teamId,
-                    location: document.getElementById(`team-${teamId}-location`).value,
-                    ecoPoints: parseFloat(document.getElementById(`team-${teamId}-eco`).value),
-                    oilVolume: parseFloat(document.getElementById(`team-${teamId}-oil`).value) * 1000000,
-                    petrolPercent: parseFloat(document.getElementById(`team-${teamId}-petrol`).value),
-                    dieselPercent: parseFloat(document.getElementById(`team-${teamId}-diesel`).value),
-                    priceMod: parseFloat(document.getElementById(`team-${teamId}-price-mod`).value) || 0
-                };
-                
-                team.petrolVolume = team.oilVolume * team.petrolPercent / 100;
-                team.dieselVolume = team.oilVolume * team.dieselPercent / 100;
-                
-                currentTeams.push(team);
-            });
-            
-            // Проверяем, что команд от 2 до 7
-            if (currentTeams.length < 2 || currentTeams.length > 7) {
-                alert('Должно быть от 2 до 7 команд!');
-                return;
+
+        function processDiceResult() {
+            if (profitData.currentStrategy === 'bad') {
+                if (profitData.diceRoll <= 3) {
+                    profitData.finalProfit = profitData.baseProfit * 0.7;
+                } else {
+                    profitData.finalProfit = profitData.baseProfit + 200000;
+                }
+            } else {
+                if (profitData.diceRoll <= 3) {
+                    profitData.finalProfit = profitData.baseProfit * 0.85; // Исправлено: -15% от базовой прибыли
+                } else {
+                    profitData.finalProfit = profitData.baseProfit + 500000; // +500 тыс. мгр
+                }
             }
             
-            // Рассчитываем средние эко-баллы
-            const totalEcoPoints = currentTeams.reduce((sum, team) => sum + team.ecoPoints, 0);
-            currentAverageEco = totalEcoPoints / currentTeams.length;
-            
-            // Базовые корпоративные цены с учетом средних эко-баллов
-            currentBasePetrolPrice = BASE_PETROL_PRICE + currentAverageEco;
-            currentBaseDieselPrice = BASE_DIESEL_PRICE + currentAverageEco;
-            
-            // Рассчитываем прибыль для каждой команды
-            currentTeams.forEach(team => {
-                team.petrolPrice = currentBasePetrolPrice * (1 + team.priceMod / 100);
-                team.dieselPrice = currentBaseDieselPrice * (1 + team.priceMod / 100);
-                team.profit = team.petrolVolume * team.petrolPrice + team.dieselVolume * team.dieselPrice;
-            });
-            
-            // Общая прибыль корпорации
-            let totalProfit = currentTeams.reduce((sum, team) => sum + team.profit, 0);
-            
-            // Бонус за объединение (+10%)
-            const bonusProfit = totalProfit * 0.1;
-            const totalWithBonus = totalProfit + bonusProfit;
-            
-            // Распределяем прибыль пропорционально вкладу
-            currentTeams.forEach(team => {
-                team.share = team.profit / totalProfit;
-                team.finalProfit = team.share * totalWithBonus;
-            });
-            
-            // Обновляем результаты
-            updateResults();
+            document.getElementById('dice-screen').style.display = 'none';
+            showResult();
         }
-        
-        // Обновление отображения результатов
-        function updateResults() {
-            const corporateHTML = `
-                <p><strong>Среднее количество эко-баллов:</strong> ${currentAverageEco.toFixed(2)}</p>
-                <p><strong>Базовая корпоративная цена бензина:</strong> ${currentBasePetrolPrice.toFixed(2)} мгр/баррель</p>
-                <p><strong>Базовая корпоративная цена дизеля:</strong> ${currentBaseDieselPrice.toFixed(2)} мгр/баррель</p>
-                <hr>
+
+        function showResult() {
+            const finalPetrolPrice = (profitData.petrolPrice + profitData.ecoPoints) * (1 + profitData.priceMod / 100);
+            const finalDieselPrice = (profitData.dieselPrice + profitData.ecoPoints) * (1 + profitData.priceMod / 100);
+
+            let resultHTML = `
+                <div class="result-item">
+                    <h3>${currentLocation.name}</h3>
+                    <p><strong>Общий объём нефти:</strong> ${(profitData.oilVolume / 1000000).toFixed(2)} млн баррелей</p>
+                    <p><strong>Бензин:</strong> ${(profitData.petrolVolume / 1000000).toFixed(2)} млн баррелей × ${finalPetrolPrice.toFixed(2)} мгр/баррель</p>
+                    <p><strong>Дизель:</strong> ${(profitData.dieselVolume / 1000000).toFixed(2)} млн баррелей × ${finalDieselPrice.toFixed(2)} мгр/баррель</p>
+                    <p><strong>Поправка к цене:</strong> ${profitData.priceMod > 0 ? '+' : ''}${profitData.priceMod}%</p>
+                    <p><strong>Эко-баллы:</strong> <span class="${profitData.ecoPoints > 0 ? 'positive' : profitData.ecoPoints < 0 ? 'negative' : ''}">${profitData.ecoPoints}</span></p>
+                    <p><strong>Базовая прибыль:</strong> ${Math.round(profitData.baseProfit).toLocaleString()} мгр</p>
             `;
-            
-            let teamsHTML = '';
-            currentTeams.forEach(team => {
-                teamsHTML += `
-                    <div class="team-result">
-                        <h3>${team.location} (Команда ${team.id})</h3>
-                        <p><strong>Добыто нефти:</strong> ${(team.oilVolume / 1000000).toFixed(2)} млн баррелей</p>
-                        <p><strong>Эко-баллы:</strong> <span class="${team.ecoPoints > 0 ? 'positive' : team.ecoPoints < 0 ? 'negative' : ''}">${team.ecoPoints}</span></p>
-                        <p><strong>Цена бензина:</strong> ${team.petrolPrice.toFixed(2)} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
-                        <p><strong>Цена дизеля:</strong> ${team.dieselPrice.toFixed(2)} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
-                        <p><strong>Доля в корпорации:</strong> ${(team.share * 100).toFixed(1)}%</p>
-                        <p><strong>Итоговая прибыль:</strong> <strong>${Math.round(team.finalProfit).toLocaleString()} мгр</strong></p>
-                    </div>
+
+            if (profitData.diceRoll > 0) {
+                resultHTML += `
+                    <p><strong>Бросок кубика:</strong> <span class="dice-roll">${profitData.diceRoll}</span> 
+                    (${profitData.currentStrategy === 'bad' ? 
+                        profitData.diceRoll <= 3 ? '1-3: Партнёр требует долю → -30% прибыли' : '4-6: Удачное сотрудничество → +200 тыс мгр' :
+                        profitData.diceRoll <= 3 ? '1-3: Партнёр забирает 15% прибыли' : '4-6: Удачный альянс → +500 тыс мгр'})
+                    </p>
                 `;
-            });
-            
-            document.getElementById('corporate-info').innerHTML = corporateHTML;
-            document.getElementById('team-results').innerHTML = teamsHTML;
-            document.getElementById('result-section').classList.remove('hidden');
+            }
+
+            resultHTML += `
+                    <p><strong>Итоговая прибыль:</strong> <span style="font-size: 1.2em; font-weight: bold;">${Math.round(profitData.finalProfit).toLocaleString()} мгр</span></p>
+                </div>
+            `;
+
+            document.getElementById('result-content').innerHTML = resultHTML;
+            document.getElementById('result-screen').style.display = 'block';
         }
     </script>
 </body>
