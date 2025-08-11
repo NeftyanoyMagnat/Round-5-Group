@@ -316,8 +316,10 @@
                     </div>
                 `;
                 
-                // По умолчанию применяем снижение цены
-                applyEcoDecision('price-cut');
+                // Выбираем первый вариант по умолчанию
+                setTimeout(() => {
+                    document.querySelector('.decision-option')?.click();
+                }, 0);
             } 
             else if (currentAverageEco >= 5) {
                 // Вариант Б: высокие эко-баллы
@@ -335,8 +337,10 @@
                     </div>
                 `;
                 
-                // По умолчанию применяем премиальную продажу
-                applyEcoDecision('premium-sale');
+                // Выбираем первый вариант по умолчанию
+                setTimeout(() => {
+                    document.querySelector('.decision-option')?.click();
+                }, 0);
             }
             else {
                 // Нейтральный случай - просто пересчитываем прибыль
@@ -357,7 +361,9 @@
             });
             
             // Выделяем выбранный вариант
-            event.target.classList.add('selected');
+            if (event && event.target) {
+                event.target.classList.add('selected');
+            }
             
             // Показываем результат выбора
             const resultDiv = document.getElementById('eco-decision-result');
@@ -412,10 +418,14 @@
                     team.petrolVolume -= premiumVolumePetrol;
                     team.dieselVolume -= premiumVolumeDiesel;
                     
-                    team.profit = (team.petrolVolume * basePetrolPrice * (1 + team.priceMod / 100)) +
-                                 (team.dieselVolume * baseDieselPrice * (1 + team.priceMod / 100)) +
-                                 (premiumVolumePetrol * basePetrolPrice * 2 * (1 + team.priceMod / 100)) +
-                                 (premiumVolumeDiesel * baseDieselPrice * 2 * (1 + team.priceMod / 100));
+                    // Инициализация цен для команды
+                    team.petrolPrice = basePetrolPrice * (1 + team.priceMod / 100);
+                    team.dieselPrice = baseDieselPrice * (1 + team.priceMod / 100);
+                    
+                    team.profit = (team.petrolVolume * team.petrolPrice) +
+                                 (team.dieselVolume * team.dieselPrice) +
+                                 (premiumVolumePetrol * team.petrolPrice * 2) +
+                                 (premiumVolumeDiesel * team.dieselPrice * 2);
                     
                     // Возвращаем объемы на место для возможного пересчета
                     team.petrolVolume += premiumVolumePetrol;
@@ -429,12 +439,9 @@
             // Рассчитываем прибыль для каждой команды (если не премиальная продажа)
             if (currentEcoDecision !== 'premium-sale') {
                 currentTeams.forEach(team => {
-                    const teamPetrolPrice = basePetrolPrice * (1 + team.priceMod / 100);
-                    const teamDieselPrice = baseDieselPrice * (1 + team.priceMod / 100);
-                    
-                    team.petrolPrice = teamPetrolPrice;
-                    team.dieselPrice = teamDieselPrice;
-                    team.profit = team.petrolVolume * teamPetrolPrice + team.dieselVolume * teamDieselPrice;
+                    team.petrolPrice = basePetrolPrice * (1 + team.priceMod / 100);
+                    team.dieselPrice = baseDieselPrice * (1 + team.priceMod / 100);
+                    team.profit = team.petrolVolume * team.petrolPrice + team.dieselVolume * team.dieselPrice;
                 });
             }
             
@@ -475,8 +482,8 @@
                         <h3>${team.location} (Команда ${team.id})</h3>
                         <p><strong>Добыто нефти:</strong> ${(team.oilVolume / 1000000).toFixed(2)} млн баррелей</p>
                         <p><strong>Эко-баллы:</strong> <span class="${team.ecoPoints > 0 ? 'positive' : team.ecoPoints < 0 ? 'negative' : ''}">${team.ecoPoints}</span></p>
-                        <p><strong>Цена бензина:</strong> ${team.petrolPrice.toFixed(2)} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
-                        <p><strong>Цена дизеля:</strong> ${team.dieselPrice.toFixed(2)} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
+                        <p><strong>Цена бензина:</strong> ${team.petrolPrice ? team.petrolPrice.toFixed(2) : '0.00'} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
+                        <p><strong>Цена дизеля:</strong> ${team.dieselPrice ? team.dieselPrice.toFixed(2) : '0.00'} мгр/баррель (${team.priceMod > 0 ? '+' : ''}${team.priceMod}%)</p>
                         <p><strong>Доля в корпорации:</strong> ${(team.share * 100).toFixed(1)}%</p>
                         <p><strong>Итоговая прибыль:</strong> <strong>${Math.round(team.finalProfit).toLocaleString()} мгр</strong></p>
                     </div>
